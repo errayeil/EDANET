@@ -1,0 +1,47 @@
+{
+  "id": 27,
+  "id64": 10477373803,
+  "name": "Sol",
+  "marketId": 128016384,
+  "sId": 375,
+  "sName": "Daedalus",
+  "url": "https:\/\/www.edsm.net\/en\/system\/stations\/id\/27\/name\/Sol\/details\/facility\/shipyard\/idS\/375\/nameS\/Daedalus",
+  "ships": [
+    {
+      "id": 128049249,
+      "name": "Sidewinder"
+    },
+    {
+      "id": 128049255,
+      "name": "Eagle"
+    },
+    {
+      "id": 128049261,
+      "name": "Hauler"
+    },
+    {
+      "id": 128049309,
+      "name": "Vulture"
+    },
+    {
+      "id": 128049321,
+      "name": "Federal Dropship"
+    },
+    {
+      "id": 128049333,
+      "name": "Type-9 Heavy"
+    },
+    {
+      "id": 128672145,
+      "name": "Federal Assault Ship"
+    },
+    {
+      "id": 128672152,
+      "name": "Federal Gunship"
+    },
+    {
+      "id": 128672269,
+      "name": "Keelback"
+    }
+  ]
+}
