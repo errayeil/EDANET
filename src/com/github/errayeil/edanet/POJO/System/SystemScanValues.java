@@ -48,14 +48,14 @@ public class SystemScanValues {
 
     @Override
     public String toString( ) {
-        return "SystemScanValues{" +
-                "id=" + id +
-                ", id64=" + id64 +
-                ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", estimatedValue=" + estimatedValue +
-                ", estimatedValueMapped=" + estimatedValueMapped +
-                ", valuableBodies=" + Arrays.toString( valuableBodies ) +
-                '}';
+        return "{\"SystemScanValues\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"id64\":\"" + id64 + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"url\":\"" + url + "\""
+                + ", \"estimatedValue\":\"" + estimatedValue + "\""
+                + ", \"estimatedValueMapped\":\"" + estimatedValueMapped + "\""
+                + ", \"valuableBodies\":" + Arrays.toString( valuableBodies )
+                + "}}";
     }
 }

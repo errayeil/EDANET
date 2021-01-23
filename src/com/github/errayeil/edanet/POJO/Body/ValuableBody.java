@@ -8,32 +8,32 @@ package com.github.errayeil.edanet.POJO.Body;
 public class ValuableBody {
     
     /**
-     *
+     * Celestial body EDSM id.
      */
     public long bodyId;
     
     /**
-     *
+     * Celestial body name.
      */
     public String bodyName;
     
     /**
-     *
+     * Distance from system arrival point
      */
     public long distance;
     
     /**
-     *
+     * Maximum scan value.
      */
     public long valueMax;
 
     @Override
     public String toString( ) {
-        return "ValuableBody{" +
-                "bodyId=" + bodyId +
-                ", bodyName='" + bodyName + '\'' +
-                ", distance=" + distance +
-                ", valueMax=" + valueMax +
-                '}';
+        return "{\"ValuableBody\":{"
+                + "\"bodyId\":\"" + bodyId + "\""
+                + ", \"bodyName\":\"" + bodyName + "\""
+                + ", \"distance\":\"" + distance + "\""
+                + ", \"valueMax\":\"" + valueMax + "\""
+                + "}}";
     }
 }

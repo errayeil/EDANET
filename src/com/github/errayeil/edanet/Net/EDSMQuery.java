@@ -38,10 +38,34 @@ public class EDSMQuery {
     }
 
     /**
-     *
+     * Returns the searched system as a POJO, but with minimal information. No body info, stations, etc.
+     * Use getAllInfoFor if you want all the information on a system.
+     * @param systemName
+     * @return
+     */
+    public EDSMSystem getBaseSystemInfo(final String systemName) throws URISyntaxException, IOException {
+        if (systemName.isEmpty() || systemName.isBlank())
+            throw new IllegalArgumentException( "System name specified is empty." );
+
+        builder.setBuilderURI( EDSMURLS.edsm_system_url );
+
+        builder.addBuilderParameter( "systemName", systemName );
+        builder.addBuilderParameter( "showInformation", "1" );
+        builder.addBuilderParameter( "showId", "1" );
+        builder.addBuilderParameter( "showCoordinates", "1" );
+        builder.addBuilderParameter( "showPermit", "1" );
+        builder.addBuilderParameter( "showPrimaryStar", "1" );
+
+        String systemContent = readContent( builder.build() );
+        return EDSMParser.parseSystemJson( systemContent );
+    }
+
+    /**
+     * Gets all the information on a given system EDSM can provide. Depending on the amount of information,
+     * this make take a few seconds.
      * @param systemName
      */
-    public EDSMSystem searchForSystem( final String systemName) throws URISyntaxException, IOException {
+    public EDSMSystem getAllInfoFor( final String systemName) throws URISyntaxException, IOException {
         if (systemName.isEmpty() || systemName.isBlank())
             throw new IllegalArgumentException( "System name specified is empty." );
         builder.setBuilderURI( EDSMURLS.edsm_system_url );
@@ -105,7 +129,22 @@ public class EDSMQuery {
             builder.addBuilderParameter( "marketId", String.valueOf( station.marketId ) );
 
             String shipyardContent = readContent( builder.build( ) );
+
+            builder.clear();
+            builder.setBuilderURI( EDSMURLS.edsm_outfitting_url );
+            builder.addBuilderParameter( "marketId", String.valueOf( station.marketId) );
+
+            String outfittingContent = readContent( builder.build() );
+
+            builder.clear();
+            builder.setBuilderURI( EDSMURLS.edsm_market_url );
+            builder.addBuilderParameter( "marketId", String.valueOf( station.marketId) );
+
+            String marketContent = readContent( builder.build( ) );
+
             station.shipyard = EDSMParser.parseStationShipyardJson( shipyardContent );
+            station.outfitting = EDSMParser.parseStationOutfittingJson( outfittingContent );
+            station.market = EDSMParser.parseStationMarketJson( marketContent );
         }
 
         return system;

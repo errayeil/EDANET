@@ -46,14 +46,14 @@ public class SystemTraffic {
 
     @Override
     public String toString( ) {
-        return "SystemTraffic{" +
-                "id=" + id +
-                ", id64=" + id64 +
-                ", name='" + name + '\'' +
-                ", total=" + total +
-                ", week=" + week +
-                ", day=" + day +
-                ", breakdown=" + breakdown +
-                '}';
+        return "{\"SystemTraffic\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"id64\":\"" + id64 + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"total\":\"" + total + "\""
+                + ", \"week\":\"" + week + "\""
+                + ", \"day\":\"" + day + "\""
+                + ", \"breakdown\":" + breakdown
+                + "}}";
     }
 }

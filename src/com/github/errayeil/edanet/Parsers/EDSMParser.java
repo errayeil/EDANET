@@ -8,6 +8,7 @@ import com.github.errayeil.edanet.POJO.Station.*;
 import com.github.errayeil.edanet.POJO.System.*;
 import com.google.gson.*;
 
+import javax.swing.plaf.PanelUI;
 import java.util.*;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class EDSMParser {
         EDSMSystem.id64 = object.get( "id64" ).getAsLong();
         EDSMSystem.coordsLocked = object.get( "coordsLocked" ).getAsBoolean();
         EDSMSystem.requirePermit = object.get( "requirePermit" ).getAsBoolean();
-        EDSMSystem.permitName = object.get( "permitName" ).getAsString();
+        EDSMSystem.permitName = object.has( "permitName" ) && !object.get( "permitName" ).isJsonNull() ? object.get( "permitName" ).getAsString() : null;
         EDSMSystem.coords = gson.fromJson( object.getAsJsonObject( "coords" ), SystemCoordinates.class );
         EDSMSystem.information = gson.fromJson( object.getAsJsonObject( "information" ), SystemInformation.class );
         EDSMSystem.primaryStar = gson.fromJson( object.getAsJsonObject( "primaryStar" ), SystemPrimaryStar.class );
@@ -207,13 +208,16 @@ public class EDSMParser {
             station.type = object.get( "type" ).getAsString();
             station.name = object.get( "name" ).getAsString();
 
-            StationControllingFaction faction = new StationControllingFaction();
-            JsonObject obj = object.getAsJsonObject( "controllingFaction" );
+            if (object.has( "controllingFaction") && !object.get( "controllingFaction" ).isJsonNull()) {
+                StationControllingFaction faction = new StationControllingFaction();
+                JsonObject obj = object.getAsJsonObject( "controllingFaction" );
 
-            faction.name = obj.get( "name" ).getAsString();
-            faction.id = obj.has( "id" ) && !obj.get( "id" ).isJsonNull() ? obj.get( "id" ).getAsLong() : -1;
+                faction.name = obj.get( "name" ).getAsString();
+                faction.id = obj.has( "id" ) && !obj.get( "id" ).isJsonNull() ? obj.get( "id" ).getAsLong() : -1;
 
-            station.stationControllingFaction = faction;
+                station.stationControllingFaction = faction;
+            }
+
             stations.add(station);
         }
 
@@ -416,18 +420,20 @@ public class EDSMParser {
         shipyard.stationName = object.get( "sName" ).getAsString();
         shipyard.url = object.has( "url" ) && !object.get( "url" ).isJsonNull() ? object.get( "url" ).getAsString() : "";
 
-        JsonArray array = object.getAsJsonArray( "ships" );
+        if (!object.get( "ships" ).isJsonNull()) {
+            JsonArray array = object.getAsJsonArray( "ships" );
 
-        for (JsonElement element : array) {
-            JsonObject obj = element.getAsJsonObject();
-            StationShip ship = new StationShip();
+            for (JsonElement element : array) {
+                JsonObject obj = element.getAsJsonObject();
+                StationShip ship = new StationShip();
 
-            ship.id = obj.get( "id" ).getAsLong();
-            ship.name = obj.get( "name" ).getAsString();
-            ships.add( ship );
+                ship.id = obj.get( "id" ).getAsLong();
+                ship.name = obj.get( "name" ).getAsString();
+                ships.add( ship );
+            }
+
+            shipyard.ships = ships.toArray( ships.toArray( new StationShip[ ships.size() ] ) );
         }
-
-        shipyard.ships = ships.toArray( ships.toArray( new StationShip[ ships.size() ] ) );
 
         return shipyard;
     }
@@ -439,7 +445,77 @@ public class EDSMParser {
      */
     public static StationMarket parseStationMarketJson( String marketContent) {
         StationMarket market = new StationMarket();
+        List<MarketCommodity> coms = new ArrayList<>();
+
+        JsonObject object = JsonParser.parseString( marketContent ).getAsJsonObject();
+
+        market.id = object.get( "id" ).getAsLong();
+        market.id64 = object.get( "marketId" ).getAsLong();
+        market.systemName = object.get( "name" ).getAsString();
+        market.marketId = object.get( "marketId" ).getAsLong();
+        market.stationId = object.get( "sId" ).getAsLong();
+        market.stationName = object.get( "sName" ).getAsString();
+        market.url = object.has( "url" ) && object.get( "url" ).isJsonNull() ? object.get( "url" ).getAsString() : null;
+
+        if (!object.get( "commodities" ).isJsonNull()) {
+            JsonArray array = object.getAsJsonArray( "commodities" );
+
+            for (JsonElement element : array) {
+                JsonObject obj = element.getAsJsonObject();
+                MarketCommodity com = new MarketCommodity();
+
+                com.id = obj.get( "id" ).getAsString();
+                com.name = obj.get( "name" ).getAsString();
+                com.buyPrice = obj.get( "buyPrice" ).getAsLong();
+                com.stock = obj.get( "stock" ).getAsLong();
+                com.sellPrice = obj.get( "sellPrice" ).getAsLong();
+                com.stock = obj.get( "stock" ).getAsLong();
+                com.stockBracket = obj.get( "stockBracket" ).getAsLong();
+
+                coms.add( com );
+            }
+
+            market.commodities = coms.toArray( new MarketCommodity[coms.size()] );
+        }
 
         return market;
+    }
+
+    /**
+     *
+     * @param outfittingContent
+     * @return
+     */
+    public static StationOutfitting parseStationOutfittingJson( String outfittingContent) {
+        StationOutfitting outfitting = new StationOutfitting();
+        List<OutfittingItem> items = new ArrayList<>();
+
+        JsonObject object = JsonParser.parseString( outfittingContent ).getAsJsonObject();
+
+        outfitting.id = object.get( "id" ).getAsLong();
+        outfitting.id64 = object.get( "id64" ).getAsLong();
+        outfitting.marketId = object.get( "marketId" ).getAsLong();
+        outfitting.stationId = object.get( "sId" ).getAsLong();
+        outfitting.name = object.get( "name" ).getAsString();
+        outfitting.stationName = object.get( "sName" ).getAsString();
+        outfitting.url = object.has( "url" ) && !object.get( "url" ).isJsonNull() ? object.get( "url" ).getAsString() : null;
+
+        if (!object.get( "outfitting" ).isJsonNull()) {
+            JsonArray array = object.getAsJsonArray( "outfitting" );
+
+            for (JsonElement element : array) {
+                JsonObject out = element.getAsJsonObject();
+                OutfittingItem item = new OutfittingItem();
+
+                item.id = out.get( "id" ).getAsString();
+                item.name = out.get( "name" ).getAsString();
+
+                items.add( item );
+            }
+
+            outfitting.items = items.toArray( new OutfittingItem[items.size()] );
+        }
+
+        return outfitting;
     }
 }

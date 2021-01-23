@@ -26,10 +26,10 @@ public class SystemCoordinates implements Serializable {
 
     @Override
     public String toString( ) {
-        return "SystemCoordinates{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
+        return "{\"SystemCoordinates\":{"
+                + "\"x\":\"" + x + "\""
+                + ", \"y\":\"" + y + "\""
+                + ", \"z\":\"" + z + "\""
+                + "}}";
     }
 }

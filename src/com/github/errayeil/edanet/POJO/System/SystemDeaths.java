@@ -46,11 +46,14 @@ public class SystemDeaths {
 
     @Override
     public String toString( ) {
-        return "SystemDeaths{" +
-                "id=" + id +
-                ", id64=" + id64 +
-                ", name='" + name + '\'' +
-                ", deaths=" + deaths +
-                '}';
+        return "{\"SystemDeaths\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"id64\":\"" + id64 + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"totalDeaths\":\"" + totalDeaths + "\""
+                + ", \"weeklyDeaths\":\"" + weeklyDeaths + "\""
+                + ", \"dailyDeaths\":\"" + dailyDeaths + "\""
+                + ", \"deaths\":" + deaths
+                + "}}";
     }
 }

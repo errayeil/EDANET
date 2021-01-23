@@ -34,12 +34,12 @@ public class CelestialBodyRing {
 
     @Override
     public String toString( ) {
-        return "CelestialBodyRing{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", mass=" + mass +
-                ", innerRadius=" + innerRadius +
-                ", outerRadius=" + outerRadius +
-                '}';
+        return "{\"CelestialBodyRing\":{"
+                + "\"name\":\"" + name + "\""
+                + ", \"type\":\"" + type + "\""
+                + ", \"mass\":\"" + mass + "\""
+                + ", \"innerRadius\":\"" + innerRadius + "\""
+                + ", \"outerRadius\":\"" + outerRadius + "\""
+                + "}}";
     }
 }

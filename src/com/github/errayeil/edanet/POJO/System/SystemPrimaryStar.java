@@ -26,10 +26,10 @@ public class SystemPrimaryStar implements Serializable {
 
     @Override
     public String toString( ) {
-        return "SystemPrimaryStar{" +
-                "type='" + type + '\'' +
-                ", name='" + name + '\'' +
-                ", isScoopable=" + isScoopable +
-                '}';
+        return "{\"SystemPrimaryStar\":{"
+                + "\"type\":\"" + type + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"isScoopable\":\"" + isScoopable + "\""
+                + "}}";
     }
 }

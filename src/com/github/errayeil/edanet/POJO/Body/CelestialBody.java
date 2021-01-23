@@ -196,41 +196,48 @@ public class CelestialBody {
     public String updateTime;
 
     /**
-     *
      * @return
      */
     @Override
     public String toString( ) {
-        return "CelestialBody{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", subType='" + subType + '\'' +
-                ", distanceToArrival=" + distanceToArrival +
-                ", isMainStar=" + isMainStar +
-                ", isLandable=" + isLandable +
-                ", gravity=" + gravity +
-                ", earthMasses=" + earthMasses +
-                ", radius=" + radius +
-                ", volcanismType='" + volcanismType + '\'' +
-                ", atmosphereType='" + atmosphereType + '\'' +
-                ", terraformingState='" + terraformingState + '\'' +
-                ", isScoopable=" + isScoopable +
-                ", age=" + age +
-                ", luminosity='" + luminosity + '\'' +
-                ", absoluteMagnitude=" + absoluteMagnitude +
-                ", solarMasses=" + solarMasses +
-                ", solarRadius=" + solarRadius +
-                ", surfaceTemperature=" + surfaceTemperature +
-                ", orbitalPeriod=" + orbitalPeriod +
-                ", semiMajorAxis=" + semiMajorAxis +
-                ", orbitalEccentricity=" + orbitalEccentricity +
-                ", orbitalInclination=" + orbitalInclination +
-                ", ageOfPeriapsis=" + ageOfPeriapsis +
-                ", rotationalPeriod=" + rotationalPeriod +
-                ", rotationalPeriodTidallyLocked=" + rotationalPeriodTidallyLocked +
-                ", axialTilt=" + axialTilt +
-                ", rings=" + Arrays.toString( rings ) +
-                '}';
+        return "{\"CelestialBody\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"id64\":\"" + id64 + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"type\":\"" + type + "\""
+                + ", \"subType\":\"" + subType + "\""
+                + ", \"distanceToArrival\":\"" + distanceToArrival + "\""
+                + ", \"isMainStar\":\"" + isMainStar + "\""
+                + ", \"isLandable\":\"" + isLandable + "\""
+                + ", \"gravity\":\"" + gravity + "\""
+                + ", \"earthMasses\":\"" + earthMasses + "\""
+                + ", \"radius\":\"" + radius + "\""
+                + ", \"volcanismType\":\"" + volcanismType + "\""
+                + ", \"atmosphereType\":\"" + atmosphereType + "\""
+                + ", \"terraformingState\":\"" + terraformingState + "\""
+                + ", \"spectralClass\":\"" + spectralClass + "\""
+                + ", \"isScoopable\":\"" + isScoopable + "\""
+                + ", \"age\":\"" + age + "\""
+                + ", \"luminosity\":\"" + luminosity + "\""
+                + ", \"absoluteMagnitude\":\"" + absoluteMagnitude + "\""
+                + ", \"solarMasses\":\"" + solarMasses + "\""
+                + ", \"solarRadius\":\"" + solarRadius + "\""
+                + ", \"surfaceTemperature\":\"" + surfaceTemperature + "\""
+                + ", \"orbitalPeriod\":\"" + orbitalPeriod + "\""
+                + ", \"semiMajorAxis\":\"" + semiMajorAxis + "\""
+                + ", \"orbitalEccentricity\":\"" + orbitalEccentricity + "\""
+                + ", \"orbitalInclination\":\"" + orbitalInclination + "\""
+                + ", \"ageOfPeriapsis\":\"" + ageOfPeriapsis + "\""
+                + ", \"rotationalPeriod\":\"" + rotationalPeriod + "\""
+                + ", \"rotationalPeriodTidallyLocked\":\"" + rotationalPeriodTidallyLocked + "\""
+                + ", \"axialTilt\":\"" + axialTilt + "\""
+                + ", \"atmosphereComposition\":" + atmosphereComposition
+                + ", \"solidComposition\":" + solidComposition
+                + ", \"parents\":" + parents
+                + ", \"materials\":" + materials
+                + ", \"discovery\":" + discovery
+                + ", \"rings\":" + Arrays.toString( rings )
+                + ", \"updateTime\":\"" + updateTime + "\""
+                + "}}";
     }
 }

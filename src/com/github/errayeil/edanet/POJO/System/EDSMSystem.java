@@ -2,6 +2,7 @@ package com.github.errayeil.edanet.POJO.System;
 
 import com.github.errayeil.edanet.POJO.Body.CelestialBody;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Arrays;
  * @version HIP 2
  * @since HIP 2
  */
-public class EDSMSystem {
+public class EDSMSystem implements Serializable {
     
     /**
      *
@@ -96,23 +97,23 @@ public class EDSMSystem {
      */
     @Override
     public String toString( ) {
-        return "EDSMSystem{" +
-                "id=" + id +
-                ", id64=" + id64 +
-                ", name='" + name + '\'' +
-                ", coordsLocked=" + coordsLocked +
-                ", requirePermit=" + requirePermit +
-                ", permitName='" + permitName + '\'' +
-                ", controllingFaction=" + controllingFaction +
-                ", coords=" + coords +
-                ", information=" + information +
-                ", primaryStar=" + primaryStar +
-                ", bodies=" + Arrays.toString( bodies ) +
-                ", stations=" + Arrays.toString( stations ) +
-                ", factions=" + Arrays.toString( factions ) +
-                ", scanValues=" + scanValues +
-                ", traffic=" + traffic +
-                ", deaths=" + deaths +
-                '}';
+        return "{\"EDSMSystem\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"id64\":\"" + id64 + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"coordsLocked\":\"" + coordsLocked + "\""
+                + ", \"requirePermit\":\"" + requirePermit + "\""
+                + ", \"permitName\":\"" + permitName + "\""
+                + ", \"controllingFaction\":" + controllingFaction
+                + ", \"coords\":" + coords
+                + ", \"information\":" + information
+                + ", \"primaryStar\":" + primaryStar
+                + ", \"bodies\":" + Arrays.toString( bodies )
+                + ", \"stations\":" + Arrays.toString( stations )
+                + ", \"factions\":" + Arrays.toString( factions )
+                + ", \"scanValues\":" + scanValues
+                + ", \"traffic\":" + traffic
+                + ", \"deaths\":" + deaths
+                + "}}";
     }
 }

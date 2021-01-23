@@ -19,9 +19,9 @@ public class StationControllingFaction {
 
     @Override
     public String toString( ) {
-        return "ControllingFaction{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                '}';
+        return "{\"StationControllingFaction\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"name\":\"" + name + "\""
+                + "}}";
     }
 }

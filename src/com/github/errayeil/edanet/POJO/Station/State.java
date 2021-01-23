@@ -19,9 +19,9 @@ public class State {
 
     @Override
     public String toString( ) {
-        return "State{" +
-                "state='" + state + '\'' +
-                ", trend=" + trend +
-                '}';
+        return "{\"State\":{"
+                + "\"state\":\"" + state + "\""
+                + ", \"trend\":\"" + trend + "\""
+                + "}}";
     }
 }

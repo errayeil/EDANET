@@ -1,11 +1,13 @@
 package com.github.errayeil.edanet.POJO.System;
 
+import java.io.Serializable;
+
 /**
  * @author Steven Frizell
  * @version HIP 2
  * @since HIP 2
  */
-public class SystemControllingFaction {
+public class SystemControllingFaction implements Serializable {
 
     /**
      *
@@ -27,13 +29,14 @@ public class SystemControllingFaction {
      */
     public String government;
 
+
     @Override
     public String toString( ) {
-        return "SystemControllingFaction{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", allegiance='" + allegiance + '\'' +
-                ", government='" + government + '\'' +
-                '}';
+        return "{\"SystemControllingFaction\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"allegiance\":\"" + allegiance + "\""
+                + ", \"government\":\"" + government + "\""
+                + "}}";
     }
 }

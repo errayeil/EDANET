@@ -77,18 +77,19 @@ public class SystemFaction {
 
     @Override
     public String toString( ) {
-        return "SystemFaction{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", allegiance='" + allegiance + '\'' +
-                ", government='" + government + '\'' +
-                ", influence=" + influence +
-                ", state='" + state + '\'' +
-                ", isPlayer=" + isPlayer +
-                ", influenceHistory=" + influenceHistory +
-                ", stateHistory=" + stateHistory +
-                ", recoveringStates=" + Arrays.toString( recoveringStates ) +
-                ", pendingStates=" + Arrays.toString( pendingStates ) +
-                '}';
+        return "{\"SystemFaction\":{"
+                + "\"id\":\"" + id + "\""
+                + ", \"name\":\"" + name + "\""
+                + ", \"allegiance\":\"" + allegiance + "\""
+                + ", \"government\":\"" + government + "\""
+                + ", \"influence\":\"" + influence + "\""
+                + ", \"state\":\"" + state + "\""
+                + ", \"isPlayer\":\"" + isPlayer + "\""
+                + ", \"influenceHistory\":" + influenceHistory
+                + ", \"stateHistory\":" + stateHistory
+                + ", \"recoveringStates\":" + Arrays.toString( recoveringStates )
+                + ", \"pendingStates\":" + Arrays.toString( pendingStates )
+                + ", \"controllingFaction\":" + controllingFaction
+                + "}}";
     }
 }

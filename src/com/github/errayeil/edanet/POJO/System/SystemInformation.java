@@ -25,14 +25,14 @@ public class SystemInformation implements Serializable {
 
     @Override
     public String toString( ) {
-        return "SystemInformation{" +
-                "allegiance='" + allegiance + '\'' +
-                ", government='" + government + '\'' +
-                ", faction='" + faction + '\'' +
-                ", factionState='" + factionState + '\'' +
-                ", security='" + security + '\'' +
-                ", economy='" + economy + '\'' +
-                ", population=" + population +
-                '}';
+        return "{\"SystemInformation\":{"
+                + "\"allegiance\":\"" + allegiance + "\""
+                + ", \"government\":\"" + government + "\""
+                + ", \"faction\":\"" + faction + "\""
+                + ", \"factionState\":\"" + factionState + "\""
+                + ", \"security\":\"" + security + "\""
+                + ", \"economy\":\"" + economy + "\""
+                + ", \"population\":\"" + population + "\""
+                + "}}";
     }
 }

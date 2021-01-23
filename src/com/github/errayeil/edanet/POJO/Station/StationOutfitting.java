@@ -2,18 +2,13 @@ package com.github.errayeil.edanet.POJO.Station;
 
 import java.util.Arrays;
 
-/**
- * @author Steven Frizell
- * @version HIP 2
- * @since HIP 2
- */
-public class StationShipyard {
+public class StationOutfitting {
 
     public long id;
 
     public long id64;
 
-    public String systemName;
+    public String name;
 
     public long marketId;
 
@@ -23,19 +18,19 @@ public class StationShipyard {
 
     public String url;
 
-    public StationShip[] ships;
+    public OutfittingItem[] items;
 
     @Override
     public String toString( ) {
-        return "{\"StationShipyard\":{"
+        return "{\"StationOutfitting\":{"
                 + "\"id\":\"" + id + "\""
                 + ", \"id64\":\"" + id64 + "\""
-                + ", \"systemName\":\"" + systemName + "\""
+                + ", \"name\":\"" + name + "\""
                 + ", \"marketId\":\"" + marketId + "\""
                 + ", \"stationId\":\"" + stationId + "\""
                 + ", \"stationName\":\"" + stationName + "\""
                 + ", \"url\":\"" + url + "\""
-                + ", \"ships\":" + Arrays.toString( ships )
+                + ", \"items\":" + Arrays.toString( items )
                 + "}}";
     }
 }
