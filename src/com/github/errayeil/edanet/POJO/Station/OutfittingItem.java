@@ -1,6 +1,8 @@
 package com.github.errayeil.edanet.POJO.Station;
 
-public class OutfittingItem {
+import java.io.Serializable;
+
+public class OutfittingItem implements Serializable {
 
     public String id;
 

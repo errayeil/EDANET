@@ -3,6 +3,7 @@ package com.github.errayeil.edanet.POJO.System;
 import com.github.errayeil.edanet.POJO.Station.State;
 import com.github.errayeil.edanet.POJO.Station.StationControllingFaction;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  * @verision HIP 2
  * @since HIP 2
  */
-public class SystemFaction {
+public class SystemFaction implements Serializable {
     
     /**
      *

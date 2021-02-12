@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.System;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Map;
  * @version HIP 2
  * @since HIP 2
  */
-public class SystemTraffic {
+public class SystemTraffic implements Serializable {
     
     /**
      *

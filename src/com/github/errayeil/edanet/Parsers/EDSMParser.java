@@ -8,12 +8,19 @@ import com.github.errayeil.edanet.POJO.Station.*;
 import com.github.errayeil.edanet.POJO.System.*;
 import com.google.gson.*;
 
-import javax.swing.plaf.PanelUI;
 import java.util.*;
 import java.util.List;
 
+/**
+ * @author Steven Frizell
+ * @version HIP 2
+ * @since HIP 2
+ */
 public class EDSMParser {
 
+    /**
+     *
+     */
     private EDSMParser() {}
 
     /**
@@ -328,7 +335,7 @@ public class EDSMParser {
             bodies.add(body);
         }
 
-        values.valuableBodies = bodies.toArray( new ValuableBody[bodies.size()] );
+        values.valuableBodies = bodies.toArray( new ValuableBody[ 0 ] );
 
         return values;
     }
@@ -385,18 +392,9 @@ public class EDSMParser {
 
         JsonObject deathsObject = object.getAsJsonObject( "deaths" );
 
-        Set<String> keys = deathsObject.keySet();
-
-        for (String key : keys) {
-            if (key.equals( "total" ))
-                deaths.totalDeaths = deathsObject.get( key ).getAsInt();
-
-            if (key.equals( "week" ))
-                deaths.weeklyDeaths = deathsObject.get( key ).getAsInt();
-
-            if (key.equals( "day" ))
-                deaths.dailyDeaths = deathsObject.get( key ).getAsInt();
-        }
+        deaths.dailyDeaths = deathsObject.get( "day" ).getAsInt();
+        deaths.weeklyDeaths = deathsObject.get( "week" ).getAsInt();
+        deaths.totalDeaths = deathsObject.get( "total" ).getAsInt();
 
         return deaths;
     }
@@ -408,7 +406,7 @@ public class EDSMParser {
      */
     public static StationShipyard parseStationShipyardJson( String shipyardContent) {
         StationShipyard shipyard = new StationShipyard();
-        List< StationShip > ships = new ArrayList<>();
+        List< ShipyardShip > ships = new ArrayList<>();
 
         JsonObject object = JsonParser.parseString( shipyardContent ).getAsJsonObject();
 
@@ -425,14 +423,14 @@ public class EDSMParser {
 
             for (JsonElement element : array) {
                 JsonObject obj = element.getAsJsonObject();
-                StationShip ship = new StationShip();
+                ShipyardShip ship = new ShipyardShip();
 
                 ship.id = obj.get( "id" ).getAsLong();
                 ship.name = obj.get( "name" ).getAsString();
                 ships.add( ship );
             }
 
-            shipyard.ships = ships.toArray( ships.toArray( new StationShip[ ships.size() ] ) );
+            shipyard.ships = ships.toArray( ships.toArray( new ShipyardShip[ ships.size() ] ) );
         }
 
         return shipyard;

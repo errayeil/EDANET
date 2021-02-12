@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.Station;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Arrays;
  * @version HIP 2
  * @since HIP 2
  */
-public class StationShipyard {
+public class StationShipyard implements Serializable {
 
     public long id;
 
@@ -23,7 +24,7 @@ public class StationShipyard {
 
     public String url;
 
-    public StationShip[] ships;
+    public ShipyardShip[] ships;
 
     @Override
     public String toString( ) {

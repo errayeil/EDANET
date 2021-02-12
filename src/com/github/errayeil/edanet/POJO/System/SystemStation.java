@@ -5,12 +5,14 @@ import com.github.errayeil.edanet.POJO.Station.StationMarket;
 import com.github.errayeil.edanet.POJO.Station.StationOutfitting;
 import com.github.errayeil.edanet.POJO.Station.StationShipyard;
 
+import java.io.Serializable;
+
 /**
  * @author Steven Frizell
  * @version HIP 2
  * @since HIP 2
  */
-public class SystemStation {
+public class SystemStation implements Serializable {
     
     /**
      *

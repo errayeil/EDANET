@@ -2,6 +2,7 @@ package com.github.errayeil.edanet.POJO.System;
 
 import com.github.errayeil.edanet.POJO.Body.ValuableBody;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Arrays;
  * @version HIP 2
  * @since HIP 2
  */
-public class SystemScanValues {
+public class SystemScanValues implements Serializable {
     
     /**
      *

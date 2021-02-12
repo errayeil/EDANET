@@ -15,10 +15,10 @@ import org.apache.http.util.EntityUtils;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 /**
- *
- *
  * @author Steven Frizell
  * @version HIP 2
  * @since HIP 2
@@ -33,208 +33,233 @@ public class EDSMQuery {
     /**
      *
      */
-    public EDSMQuery() {
-         builder = new QueryBuilder( );
-    }
+    private EDSMCache cache;
 
     /**
-     * Returns the searched system as a POJO, but with minimal information. No body info, stations, etc.
-     * Use getAllInfoFor if you want all the information on a system.
+     *
+     */
+    public EDSMQuery( ) {
+        builder = new QueryBuilder( );
+        cache = new EDSMCache( true );
+    }
+
+
+    /**
+     * Returns the searched system as a POJO, but with minimal information. No body info, stations, etc. Use
+     * getAllInfoFor if you want all the information on a system.
+     *
      * @param systemName
+     *
      * @return
      */
-    public EDSMSystem getBaseSystemInfo(final String systemName) throws URISyntaxException, IOException {
-        if (systemName.isEmpty() || systemName.isBlank())
+    public EDSMSystem getBasicSystemInfo( final String systemName ) {
+        if ( systemName.isEmpty( ) || systemName.isBlank( ) )
             throw new IllegalArgumentException( "System name specified is empty." );
 
-        builder.setBuilderURI( EDSMURLS.edsm_system_url );
+        String systemContent = "";
 
-        builder.addBuilderParameter( "systemName", systemName );
-        builder.addBuilderParameter( "showInformation", "1" );
-        builder.addBuilderParameter( "showId", "1" );
-        builder.addBuilderParameter( "showCoordinates", "1" );
-        builder.addBuilderParameter( "showPermit", "1" );
-        builder.addBuilderParameter( "showPrimaryStar", "1" );
+        boolean existsInCache = cache.validateSystemName( systemName );
 
-        String systemContent = readContent( builder.build() );
+        if ( existsInCache ) {
+            return cache.deserializeSystem( systemName );
+        }
+
+        builder.setTargetSystem( systemName );
+
+        try {
+            systemContent = readGetContent( builder.buildForSystem( ) );
+        } catch ( URISyntaxException e ) {
+            e.printStackTrace( );
+        }
+
+
         return EDSMParser.parseSystemJson( systemContent );
     }
 
     /**
-     * Gets all the information on a given system EDSM can provide. Depending on the amount of information,
-     * this make take a few seconds.
+     * Gets all the information on a given system EDSM can provide. Depending on the amount of information, this make
+     * take a few seconds.`
+     *
      * @param systemName
      */
-    public EDSMSystem getAllInfoFor( final String systemName) throws URISyntaxException, IOException {
-        if (systemName.isEmpty() || systemName.isBlank())
+    public EDSMSystem getExtendedSystemInfo( final String systemName ) {
+        if ( systemName.isEmpty( ) || systemName.isBlank( ) )
             throw new IllegalArgumentException( "System name specified is empty." );
-        builder.setBuilderURI( EDSMURLS.edsm_system_url );
 
-        builder.addBuilderParameter( "systemName", systemName );
-        builder.addBuilderParameter( "showInformation", "1" );
-        builder.addBuilderParameter( "showId", "1" );
-        builder.addBuilderParameter( "showCoordinates", "1" );
-        builder.addBuilderParameter( "showPermit", "1" );
-        builder.addBuilderParameter( "showPrimaryStar", "1" );
+        boolean existsInCache = cache.validateSystemName( systemName );
 
-        String systemContent = readContent( builder.build() );
-        EDSMSystem system = EDSMParser.parseSystemJson( systemContent );
-
-        builder.clear();
-        builder.setBuilderURI( EDSMURLS.edsm_bodies_url );
-        builder.addBuilderParameter( "systemName", system.name );
-
-        String systemBodiesContent = readContent( builder.build() );
-        system.bodies = EDSMParser.parseBodiesJson( systemBodiesContent );
-
-        builder.clear();
-        builder.setBuilderURI( EDSMURLS.edsm_stations_url );
-        builder.addBuilderParameter( "systemName", system.name);
-
-        String stationsContent = readContent( builder.build() );
-        system.stations = EDSMParser.parseStationsJson( stationsContent );
-
-        builder.clear();;
-        builder.setBuilderURI( EDSMURLS.edsm_factions_url );
-        builder.addBuilderParameter( "systemName", system.name );
-
-        String factionsContent = readContent( builder.build() );
-        system.factions = EDSMParser.parseStationFactionJson( factionsContent );
-        system.controllingFaction = EDSMParser.parseSystemFactionJson( factionsContent );
-
-        builder.clear();
-        builder.setBuilderURI( EDSMURLS.edsm_estimated_value_url );
-        builder.addBuilderParameter( "systemName", system.name );
-
-        String value = readContent( builder.build() );
-        system.scanValues = EDSMParser.parseSystemScanValuesJson( value );
-
-        builder.clear();
-        builder.setBuilderURI( EDSMURLS.edsm_traffic_url );
-        builder.addBuilderParameter( "systemName", system.name );
-
-        String trafficContent = readContent( builder.build() );
-        system.traffic = EDSMParser.parseSystemTrafficJson( trafficContent );
-
-        builder.clear();
-        builder.setBuilderURI( EDSMURLS.edsm_deaths_url );
-        builder.addBuilderParameter( "systemName", system.name );
-
-        String deathsContent = readContent( builder.build() );
-        system.deaths = EDSMParser.parseSystemDeathsJson( deathsContent );
-
-        for ( SystemStation station : system.stations) {
-            builder.clear();
-            builder.setBuilderURI( EDSMURLS.edsm_shipyard_url );
-            builder.addBuilderParameter( "marketId", String.valueOf( station.marketId ) );
-
-            String shipyardContent = readContent( builder.build( ) );
-
-            builder.clear();
-            builder.setBuilderURI( EDSMURLS.edsm_outfitting_url );
-            builder.addBuilderParameter( "marketId", String.valueOf( station.marketId) );
-
-            String outfittingContent = readContent( builder.build() );
-
-            builder.clear();
-            builder.setBuilderURI( EDSMURLS.edsm_market_url );
-            builder.addBuilderParameter( "marketId", String.valueOf( station.marketId) );
-
-            String marketContent = readContent( builder.build( ) );
-
-            station.shipyard = EDSMParser.parseStationShipyardJson( shipyardContent );
-            station.outfitting = EDSMParser.parseStationOutfittingJson( outfittingContent );
-            station.market = EDSMParser.parseStationMarketJson( marketContent );
+        if ( existsInCache ) {
+            return cache.deserializeSystem( systemName );
         }
 
+        builder.setTargetSystem( systemName );
+
+        EDSMSystem system = null;
+
+        try {
+            String systemContent = readGetContent( builder.buildForSystem( ) );
+            system = EDSMParser.parseSystemJson( systemContent );
+
+            String systemBodiesContent = readGetContent( builder.buildForSystemBodies( ) );
+            system.bodies = EDSMParser.parseBodiesJson( systemBodiesContent );
+
+            String stationsContent = readGetContent( builder.buildForSystemStations( ) );
+            system.stations = EDSMParser.parseStationsJson( stationsContent );
+
+            String factionsContent = readGetContent( builder.buildForSystemFactions( ) );
+            system.factions = EDSMParser.parseStationFactionJson( factionsContent );
+            system.controllingFaction = EDSMParser.parseSystemFactionJson( factionsContent );
+
+            String value = readGetContent( builder.buildForSystemScanValues( ) );
+            system.scanValues = EDSMParser.parseSystemScanValuesJson( value );
+
+            String trafficContent = readGetContent( builder.buildForSystemTraffic( ) );
+            system.traffic = EDSMParser.parseSystemTrafficJson( trafficContent );
+
+            String deathsContent = readGetContent( builder.buildForSystemDeaths( ) );
+            system.deaths = EDSMParser.parseSystemDeathsJson( deathsContent );
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        if (system == null) {
+            return new EDSMSystem();
+        }
+
+        CyclicBarrier barrier = new CyclicBarrier( system.stations.length + 1 );
+
+        for ( SystemStation station : system.stations ) {
+
+            Runnable run = ( ) -> {
+                String shipyardContent = "";
+                String outfittingContent = "";
+                String marketContent = "";
+
+                try {
+                    builder.setTargetMarketId( String.valueOf( station.marketId ) );
+
+                    marketContent = readGetContent( builder.buildForStationMarket( ) );
+                    shipyardContent = readGetContent( builder.buildForMarketShipyard( ) );
+                    outfittingContent = readGetContent( builder.buildForMarketOutfitting( ) );
+                } catch ( URISyntaxException e ) {
+                    e.printStackTrace( );
+                }
+
+                station.shipyard = EDSMParser.parseStationShipyardJson( shipyardContent );
+                station.outfitting = EDSMParser.parseStationOutfittingJson( outfittingContent );
+                station.market = EDSMParser.parseStationMarketJson( marketContent );
+
+                try {
+                    System.out.println( "Awaiting" );
+                    barrier.await( );
+                } catch ( InterruptedException | BrokenBarrierException e ) {
+                    e.printStackTrace( );
+                }
+            };
+
+            Thread thread = new Thread( run );
+            thread.setName( "Station-thread-" + station.name );
+            thread.start( );
+        }
+
+
+        try {
+            System.out.println( "Awaiting before return." );
+            barrier.await( );
+        } catch ( InterruptedException | BrokenBarrierException e ) {
+            e.printStackTrace( );
+        }
         return system;
     }
 
     /**
-     *
      * @param referenceSystem
-     * @param radius
-     * throws IllegalArgumentException Thrown if the reference system is empty or the radius is greater than 100.
+     * @param radius          throws IllegalArgumentException Thrown if the reference system is empty or the radius is
+     *                        greater than 100.
      */
-    public void searchForSystemsInRadius(final String referenceSystem, final int radius) throws URISyntaxException {
-        if (referenceSystem.isEmpty() || referenceSystem.isBlank())
+    public void searchForSystemsInRadius( final String referenceSystem, final int radius ) throws URISyntaxException {
+        if ( referenceSystem.isEmpty( ) || referenceSystem.isBlank( ) )
             throw new IllegalArgumentException( "Specified reference system is empty." );
-        if (radius > 100)
+        if ( radius > 100 )
             throw new IllegalArgumentException( "Radius cannot be greater than 100." );
-        builder.setBuilderURI( EDSMURLS.edsm_sphere_systems_url );
+
+
     }
 
     /**
-     *
      * @param coordinates
-     * @param radius
-     * throws IllegalArgumentException Thrown if the reference coordinates are empty or the radius is greater than 100.
+     * @param radius      throws IllegalArgumentException Thrown if the reference coordinates are empty or the radius is
+     *                    greater than 100.
      */
-    public void searchForSystemsInRadius( final SystemCoordinates coordinates, final int radius) throws URISyntaxException {
-        if (coordinates == null)
+    public void searchForSystemsInRadius( final SystemCoordinates coordinates, final int radius ) throws URISyntaxException {
+        if ( coordinates == null )
             throw new IllegalArgumentException( "Specified coordinates are null." );
 
-        if (radius > 100)
+        if ( radius > 100 )
             throw new IllegalArgumentException( "Radius cannot be greater than 100." );
-        builder.setBuilderURI( EDSMURLS.edsm_sphere_systems_url );
+
     }
 
     /**
-     *
      * @param referenceSystem
-     * @param size
-     * throws IllegalArgumentException Thrown if the reference system is empty or the cube size is greater than 200.
+     * @param size            throws IllegalArgumentException Thrown if the reference system is empty or the cube size
+     *                        is greater than 200.
      */
-    public void searchForSystemsInCube(final String referenceSystem, final int size) throws URISyntaxException {
-        if (referenceSystem.isEmpty() || referenceSystem.isBlank())
+    public void searchForSystemsInCube( final String referenceSystem, final int size ) throws URISyntaxException {
+        if ( referenceSystem.isEmpty( ) || referenceSystem.isBlank( ) )
             throw new IllegalArgumentException( "Specified reference system is empty." );
 
-        if (size > 200)
+        if ( size > 200 )
             throw new IllegalArgumentException( "Cube size cannot be greater than 200." );
-        builder.setBuilderURI( EDSMURLS.edsm_cube_systems_url );
+
     }
 
     /**
-     *
      * @param coordinates
-     * @param size
-     * throws IllegalArgumentException Thrown if the reference coordinates are empty or the size is greater than 200.
+     * @param size        throws IllegalArgumentException Thrown if the reference coordinates are empty or the size is
+     *                    greater than 200.
      */
-    public void searchForSystemsInCube(final SystemCoordinates coordinates, final int size) throws URISyntaxException {
-        if (coordinates == null)
+    public void searchForSystemsInCube( final SystemCoordinates coordinates, final int size ) throws URISyntaxException {
+        if ( coordinates == null )
             throw new IllegalArgumentException( "Specified coordinates are null." );
 
-        if (size > 200)
+        if ( size > 200 )
             throw new IllegalArgumentException( "Cube size cannot be greater than 200." );
-        builder.setBuilderURI( EDSMURLS.edsm_cube_systems_url );
+
     }
 
     /**
+     * Acquires an input stream from the HttpGet and reads the content.
      *
      * @param get
+     *
      * @return
      */
-    private String readContent( HttpGet get ) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = client.execute( get );
-        HttpEntity entity = response.getEntity();
-
+    private String readGetContent( HttpGet get ) {
         String content = "";
 
-        try ( response; BufferedInputStream bis = new BufferedInputStream( entity.getContent( ) );
-              ByteArrayOutputStream buf = new ByteArrayOutputStream( ) ) {
+        try {
+            CloseableHttpClient client = HttpClients.createDefault( );
+            CloseableHttpResponse response = client.execute( get );
+            HttpEntity entity = response.getEntity( );
 
-            int result = 0;
-            while ( ( result = bis.read( ) ) != -1 ) {
-                buf.write( ( byte ) result );
+            try ( response; BufferedInputStream bis = new BufferedInputStream( entity.getContent( ) );
+                  ByteArrayOutputStream buf = new ByteArrayOutputStream( ) ) {
+
+                int result = 0;
+                while ( ( result = bis.read( ) ) != -1 ) {
+                    buf.write( ( byte ) result );
+                }
+
+                if ( buf.size( ) != 0 ) {
+                    content = buf.toString( StandardCharsets.UTF_8 );
+                }
             }
 
-            if ( buf.size( ) != 0 ) {
-                content = buf.toString( StandardCharsets.UTF_8 );
-            }
+            EntityUtils.consume( entity );
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        EntityUtils.consume(entity);
 
         return content;
     }

@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.System;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Map;
  * @version HIP 2
  * @since HIP 2
  */
-public class SystemDeaths {
+public class SystemDeaths implements Serializable {
     
     /**
      *
@@ -38,11 +39,7 @@ public class SystemDeaths {
      *
      */
     public int dailyDeaths;
-    
-    /**
-     *
-     */
-    public Map<String, Long> deaths;
+
 
     @Override
     public String toString( ) {
@@ -53,7 +50,6 @@ public class SystemDeaths {
                 + ", \"totalDeaths\":\"" + totalDeaths + "\""
                 + ", \"weeklyDeaths\":\"" + weeklyDeaths + "\""
                 + ", \"dailyDeaths\":\"" + dailyDeaths + "\""
-                + ", \"deaths\":" + deaths
                 + "}}";
     }
 }

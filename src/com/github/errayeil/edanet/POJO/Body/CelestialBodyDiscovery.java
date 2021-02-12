@@ -1,11 +1,13 @@
 package com.github.errayeil.edanet.POJO.Body;
 
+import java.io.Serializable;
+
 /**
  * @author Steven Frizell
  * @version HIP 2
  * @since HIP 2
  */
-public class CelestialBodyDiscovery {
+public class CelestialBodyDiscovery implements Serializable {
 
     /**
      * Discovery commander.

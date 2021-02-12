@@ -11,8 +11,9 @@ public class Test {
 
     public static void main( String[] args) throws Exception {
         EDSMQuery newEDSMQuery = new EDSMQuery();
-        EDSMSystem EDSMSystem = newEDSMQuery.getAllInfoFor( "Duamta" );
+        EDSMSystem EDSMSystem = newEDSMQuery.getBasicSystemInfo( "sol" );
 
+        System.out.println( EDSMSystem.toString() );
     }
 
 

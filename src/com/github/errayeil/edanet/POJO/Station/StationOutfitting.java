@@ -1,8 +1,9 @@
 package com.github.errayeil.edanet.POJO.Station;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class StationOutfitting {
+public class StationOutfitting implements Serializable {
 
     public long id;
 

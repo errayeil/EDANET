@@ -2,9 +2,10 @@ package com.github.errayeil.edanet.POJO.Station;
 
 import jdk.jfr.Label;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class StationMarket {
+public class StationMarket implements Serializable {
 
     public long id;
 

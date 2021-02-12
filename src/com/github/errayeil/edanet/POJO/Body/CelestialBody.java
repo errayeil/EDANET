@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.Body;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import java.util.Map;
  * @version HIP 2
  * @since HIP 2
  */
-public class CelestialBody {
+public class CelestialBody implements Serializable {
     
     /**
      *
