@@ -52,12 +52,12 @@ public class SystemFaction implements Serializable {
     /**
      *
      */
-    public Map<Long, Double> influenceHistory;
+    public Map<String, Double> influenceHistory;
     
     /**
      *
      */
-    public Map<Long, String> stateHistory;
+    public Map<String, String> stateHistory;
     
     /**
      *

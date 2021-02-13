@@ -34,6 +34,10 @@ public class QueryBuilder {
 
     public static String PARA_MARKET = "marketId";
 
+    public static String PARA_RADIUS = "radius";
+
+    public static String PARA_SIZE = "size";
+
     /**
      *
      */
@@ -43,6 +47,16 @@ public class QueryBuilder {
      *
      */
     private String targetMarketId;
+
+    /**
+     *
+     */
+    private String targetRadius;
+
+    /**
+     *
+     */
+    private String targetSize;
 
 
     /**
@@ -66,6 +80,35 @@ public class QueryBuilder {
      */
     public void setTargetMarketId(String marketId) {
         targetMarketId = marketId;
+    }
+
+    /**
+     *
+     * @param radius
+     */
+    public void setTargetRadius(String radius) {
+        targetRadius = radius;
+    }
+
+    /**
+     *
+     * @param size
+     */
+    public void setTargetSize(String size) {
+        targetSize = size;
+    }
+
+    /**
+     *
+     * @return
+     * @throws URISyntaxException
+     */
+    public HttpGet buildForSystemName() throws URISyntaxException {
+        URIBuilder builder = new URIBuilder(EDSMURLS.edsm_system_url);
+
+        builder.setParameter( PARA_NAME, targetSystem );
+
+        return new HttpGet(builder.build());
     }
 
     /**
@@ -210,6 +253,42 @@ public class QueryBuilder {
        URIBuilder builder = new URIBuilder(EDSMURLS.edsm_outfitting_url);
 
        builder.setParameter( PARA_MARKET, targetMarketId );
+
+       return new HttpGet( builder.build() );
+   }
+
+    /**
+     *
+     * @return
+     * @throws URISyntaxException
+     */
+   public HttpGet buildForSystemsInRadius() throws URISyntaxException {
+       URIBuilder builder = new URIBuilder(EDSMURLS.edsm_sphere_systems_url);
+
+       builder.setParameter( PARA_NAME, targetSystem ); // reference system for radius
+       builder.setParameter( PARA_RADIUS, targetRadius );
+       builder.setParameter( PARA_COORD, PARA_ENABLE );
+       builder.setParameter( PARA_ID, PARA_ENABLE );
+       builder.setParameter( PARA_STAR, PARA_ENABLE );
+
+       return new HttpGet( builder.build() );
+   }
+
+    /**
+     *
+     * @return
+     * @throws URISyntaxException
+     */
+   public HttpGet buildForSystemsInCube() throws URISyntaxException {
+       URIBuilder builder = new URIBuilder(EDSMURLS.edsm_cube_systems_url);
+
+       builder.setParameter( PARA_NAME, targetSystem );
+       builder.setParameter( PARA_SIZE, targetSize );
+       builder.setParameter( PARA_COORD, PARA_ENABLE );
+       builder.setParameter( PARA_ID, PARA_ENABLE );
+       builder.setParameter( PARA_INFO, PARA_ENABLE );
+       builder.setParameter( PARA_STAR, PARA_ENABLE );
+
 
        return new HttpGet( builder.build() );
    }

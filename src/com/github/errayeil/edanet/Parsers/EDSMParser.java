@@ -12,6 +12,10 @@ import java.util.*;
 import java.util.List;
 
 /**
+ * A set of methods for parsing json content returned from EDSM.
+ *
+ * TODO: Separate methods into separate classes for better readability
+ * TODO: Validate any optimization opportunities.
  * @author Steven Frizell
  * @version HIP 2
  * @since HIP 2
@@ -77,13 +81,13 @@ public class EDSMParser {
             body.gravity = object.has( "gravity" )  ? object.get( "gravity" ).getAsDouble() : min;
             body.earthMasses = object.has("earthMasses")? object.get( "earthMasses" ).getAsDouble() : min;
             body.radius = object.has( "radius" ) ? object.get( "radius" ).getAsDouble() : min;
-            body.volcanismType = object.has( "volcanismType" ) ? object.get( "volcanismType" ).getAsString() : null;
-            body.atmosphereType = object.has( "atmosphereType" ) ? object.get("atmosphereType" ).getAsString() : null;
-            body.terraformingState = object.has( "terraformingState" ) && !object.get( "terraformingState" ).isJsonNull() ? object.get( "terraformingState" ).getAsString() : null;
-            body.spectralClass = object.has( "spectralClass" ) ? object.get( "spectralClass" ).getAsString() : null;
-            body.isScoopable = object.has( "isScoopable" ) ? object.get( "isScoopable" ).getAsBoolean() : false;
+            body.volcanismType = object.has( "volcanismType" ) ? object.get( "volcanismType" ).getAsString() : "N/A";
+            body.atmosphereType = object.has( "atmosphereType" ) ? object.get("atmosphereType" ).getAsString() : "N/A";
+            body.terraformingState = object.has( "terraformingState" ) && !object.get( "terraformingState" ).isJsonNull() ? object.get( "terraformingState" ).getAsString() : "N/A";
+            body.spectralClass = object.has( "spectralClass" ) && !object.get( "spectralClass" ).isJsonNull() ? object.get( "spectralClass" ).getAsString() : "N/A/";
+            body.isScoopable = object.has( "isScoopable" ) && object.get( "isScoopable" ).getAsBoolean( );
             body.age = object.has( "age" ) ? object.get( "age" ).getAsLong() : Long.MIN_VALUE;
-            body.luminosity = object.has( "luminosity" ) ? object.get( "luminosity" ).getAsString() : null;
+            body.luminosity = object.has( "luminosity" ) ? object.get( "luminosity" ).getAsString() : "N/A";
             body.absoluteMagnitude = object.has( "absoluteMagnitude" ) ? object.get( "absoluteMagnitude" ).getAsDouble() : min;
             body.solarMasses = object.has( "solarMasses" ) ? object.get( "solarMasses" ).getAsDouble() : min;
             body.solarRadius = object.has( "solarRadius" ) ? object.get( "solarRadius" ).getAsDouble() : min;
@@ -96,7 +100,7 @@ public class EDSMParser {
             body.rotationalPeriodTidallyLocked = object.has( "rotaionalPeriodTidallyLocked" ) && object.get( "rotationalPeriodTidallyLocked" ).getAsBoolean( );
             body.axialTilt = object.has( "axialTilt" ) && !object.get( "axialTilt" ).isJsonNull() ? object.get( "axialTilt" ).getAsDouble() : min;
             body.discovery = object.has( "discovery" ) && !object.get( "discovery" ).isJsonNull() ? gson.fromJson( object.get( "discovery" ).getAsJsonObject(), CelestialBodyDiscovery.class ) : null;
-            body.updateTime = object.has( "updateTime" ) ? object.get( "updateTime" ).getAsString() : null;
+            body.updateTime = object.has( "updateTime" ) ? object.get( "updateTime" ).getAsString() : "N/A";
 
             if (object.has( "atmosphereComposition" ) && !object.get( "atmosphereComposition" ).isJsonNull()) {
                 Map<String, Double> atmoComp = new HashMap<>();
@@ -208,8 +212,8 @@ public class EDSMParser {
             station.distanceToArrival = object.get( "distanceToArrival" ).getAsLong();
             station.id = object.get( "id" ).getAsLong();
             station.marketId = object.get( "marketId" ).getAsLong();
-            station.economy = object.get("economy").getAsString();
-            station.government = object.get( "government" ).getAsString();
+            station.economy = object.has( "economy" ) && !object.get( "economy" ).isJsonNull() ? object.get("economy").getAsString() : "N/A";
+            station.government = !object.get( "government" ).isJsonNull() ? object.get( "government" ).getAsString() : "N/A";
             station.haveMarket = object.get( "haveMarket" ).getAsBoolean();
             station.haveShipyard = object.get( "haveShipyard" ).getAsBoolean();
             station.type = object.get( "type" ).getAsString();
@@ -253,8 +257,34 @@ public class EDSMParser {
             faction.influence = obj.get( "influence" ).getAsDouble();
             faction.isPlayer = obj.get( "isPlayer" ).getAsBoolean();
             faction.state = obj.has( "state" ) && !obj.get( "state" ).isJsonNull() ? obj.get( "state" ).getAsString() : null;
-            //TODO state history
-            //TODO influence history
+
+            if (obj.has( "influenceHistory" ) && !obj.get( "influenceHistory" ).isJsonNull()) {
+                JsonObject infObj = obj.get( "influenceHistory" ).getAsJsonObject();
+
+                Map<String, Double> map = new HashMap<>();
+
+                Set<String> keys = infObj.keySet();
+
+                for (String s : keys) {
+                    map.put( s, infObj.get( s ).getAsDouble() );
+                }
+
+                faction.influenceHistory = map;
+            }
+
+            if (obj.has( "stateHistory" ) && !obj.get( "stateHistory" ).isJsonNull()) {
+                JsonObject histObj = obj.get( "stateHistory" ).getAsJsonObject();
+                Map<String, String> map = new HashMap<>();;
+
+                Set<String> keys = histObj.keySet();
+
+                for (String key : keys) {
+                    map.put( key, histObj.get( key ).getAsString() );
+                }
+
+                faction.stateHistory = map;
+            }
+
             //TODO recovering states
 
             if (obj.has( "controllingFaction" ) && !obj.get( "controllingFaction" ).isJsonNull()) {
@@ -515,5 +545,60 @@ public class EDSMParser {
         }
 
         return outfitting;
+    }
+
+    /**
+     *
+     * @param systemsContent
+     * @return
+     */
+    public static List<BasicSystem> parseSystemsJson(String systemsContent) {
+        List<BasicSystem> systemsList = new ArrayList<>(   );
+
+        JsonElement element = JsonParser.parseString( systemsContent );
+        JsonArray array = element.getAsJsonArray();
+
+        for (JsonElement system : array) {
+            BasicSystem basicSystem = new BasicSystem();
+            SystemCoordinates coords = new SystemCoordinates();
+            SystemPrimaryStar star = new SystemPrimaryStar();
+
+            JsonObject obj = system.getAsJsonObject();
+
+            basicSystem.id = obj.get( "id" ).getAsLong();
+            basicSystem.id64 = obj.get( "id64" ).getAsLong();
+            basicSystem.name = obj.get( "name" ).getAsString();
+            basicSystem.distance = obj.get( "distance" ).getAsDouble();
+            basicSystem.bodyCount = !obj.get( "bodyCount" ).isJsonNull() ? obj.get( "bodyCount" ).getAsLong() : 0;
+            basicSystem.coordsLocked = obj.get( "coordsLocked" ).getAsBoolean();
+
+            JsonObject coordsObj = obj.get( "coords" ).getAsJsonObject();
+
+            coords.x = coordsObj.get( "x" ).getAsDouble();
+            coords.y = coordsObj.get( "y" ).getAsDouble();
+            coords.z = coordsObj.get( "z" ).getAsDouble();
+
+            if (obj.has( "primaryStar" ) && !obj.get( "primaryStar" ).isJsonNull()) {
+                JsonObject starObj = obj.get( "primaryStar" ).getAsJsonObject();
+
+                if (starObj.has( "type" ) && !starObj.get( "type" ).isJsonNull()) {
+                    star.type = starObj.get( "type" ).getAsString();
+                }
+
+                if (starObj.has( "name" ) && !starObj.get( "name" ).isJsonNull()) {
+                    star.name = starObj.get( "name" ).getAsString();
+                }
+
+                if (starObj.has( "isScoopable" ) && !starObj.get( "isScoopable" ).isJsonNull()) {
+                    star.isScoopable = starObj.get( "isScoopable" ).getAsBoolean();
+                }
+            }
+
+            basicSystem.coords = coords;
+            basicSystem.primaryStar = star;
+            systemsList.add(basicSystem);
+        }
+
+        return systemsList;
     }
 }

@@ -188,18 +188,11 @@ public class EDSMCache {
     }
 
     /**
-     * Validates the system exists. If this has been previously searched and added to the cache,
-     * the cache will be checked. System names stored in the cache have already been validated.
-     * If it is not contained in the cache, a query will be sent to EDSM to validate if it exists.
+     * Checks if the system name has been queried before.
      *
      * @return True if it is a valid system, false otherwise.
      */
-    public boolean validateSystemName(String systemName) {
-
-//        if (getContent != null && !getContent.equals( "{}" ) && !getContent.equals( "[]" )) {
-//            return true;
-//        }
-
+    public boolean isCached( String systemName) {
         return checkCache( systemName );
     }
 
