@@ -30,7 +30,7 @@ public class EDSMParser {
     /**
      * Parses the system information from the system content.
      *
-     * @param systemContent
+     * @param systemContent The json content to parse.
      */
     public static EDSMSystem parseSystemJson( String systemContent) {
         EDSMSystem EDSMSystem = new EDSMSystem();
@@ -460,7 +460,7 @@ public class EDSMParser {
                 ships.add( ship );
             }
 
-            shipyard.ships = ships.toArray( ships.toArray( new ShipyardShip[ ships.size() ] ) );
+            shipyard.ships = ships.toArray( ships.toArray( new ShipyardShip[ 0 ] ) );
         }
 
         return shipyard;

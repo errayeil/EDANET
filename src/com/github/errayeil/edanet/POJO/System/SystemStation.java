@@ -5,6 +5,7 @@ import com.github.errayeil.edanet.POJO.Station.StationMarket;
 import com.github.errayeil.edanet.POJO.Station.StationOutfitting;
 import com.github.errayeil.edanet.POJO.Station.StationShipyard;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,7 +14,10 @@ import java.io.Serializable;
  * @since HIP 2
  */
 public class SystemStation implements Serializable {
-    
+
+    @Serial
+    private static final long serialVersionUID = 7156948263216671235L;
+
     /**
      *
      */

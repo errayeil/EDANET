@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.Body;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -8,7 +9,10 @@ import java.io.Serializable;
  * @since HIP 2
  */
 public class CelestialBodyRing implements Serializable {
-    
+
+    @Serial
+    private static final long serialVersionUID = -3285017232070709749L;
+
     /**
      *
      */

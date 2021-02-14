@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.Station;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -8,7 +9,10 @@ import java.io.Serializable;
  * @since HIP 2
  */
 public class StationControllingFaction implements Serializable {
-    
+
+    @Serial
+    private static final long serialVersionUID = 6582160446320797410L;
+
     /**
      *
      */

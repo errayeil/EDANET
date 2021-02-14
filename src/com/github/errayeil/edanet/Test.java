@@ -3,6 +3,7 @@ package com.github.errayeil.edanet;
 
 import com.github.errayeil.edanet.Net.EDAQuery;
 import com.github.errayeil.edanet.POJO.System.BasicSystem;
+import com.github.errayeil.edanet.POJO.System.EDSMSystem;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -13,12 +14,54 @@ import java.util.concurrent.TimeUnit;
  */
 public class Test {
 
-    public Test( ) throws URISyntaxException {
-        test2();
+    public Test( ) {
+        test4();
     }
 
     public static void main( String[] args) throws Exception {
         new Test();
+    }
+
+    /**
+     * Time test to see the difference between pulling from EDSM
+     * and deserializing a system from disk.
+     */
+    public void test4() {
+        long startTime = System.nanoTime();
+        String[] tests = {"sol", "sol"};
+        EDAQuery query = new EDAQuery();
+
+        long netStartTime = System.nanoTime();
+
+        query.setTargetSystem( tests[0] );
+        query.getExtendedSystemInfo();
+
+        long netEndTime = System.nanoTime();
+        double elapsedNetTime = (double) TimeUnit.SECONDS.convert( netEndTime - netStartTime, TimeUnit.NANOSECONDS );
+
+        long serialStartTime = System.nanoTime();
+
+        query.setTargetSystem( tests[1] );
+        query.getExtendedSystemInfo();
+
+        long serialEndTime = System.nanoTime();
+        double elapsedSerialTime = (double) TimeUnit.SECONDS.convert( serialEndTime - serialStartTime, TimeUnit.NANOSECONDS );
+
+        long endTime = System.nanoTime();
+        double elapsedTime = (double) TimeUnit.SECONDS.convert( endTime - startTime, TimeUnit.NANOSECONDS );
+
+        System.out.println( "Seconds for EDSM pull: " + elapsedNetTime );
+        System.out.println( "Seconds for disk pull: " + elapsedSerialTime);
+        System.out.println( "Seconds total: " + elapsedTime );
+
+    }
+
+    public void test3() {
+        EDAQuery query = new EDAQuery();
+
+        query.setTargetSystem( "Sirius" );
+
+        EDSMSystem system = query.getExtendedSystemInfo();
     }
 
     public void test2() throws URISyntaxException {

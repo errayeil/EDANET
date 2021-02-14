@@ -1,6 +1,5 @@
 package com.github.errayeil.edanet.Net;
 
-import com.github.errayeil.edanet.EDSMURLS;
 import com.github.errayeil.edanet.POJO.System.EDSMSystem;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -10,7 +9,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,23 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version HIP 2
  * @since HIP 2
  */
-public class EDSMCache {
-
-    /**
-     *
-     */
-    private QueryBuilder builder;
+public class EDACache {
 
     /**
      * System names recently searched.
      */
     private List< String > recentlySearched;
-
-    /**
-     * The absolute path of files storing json data
-     * from searches on EDSM.
-     */
-    private Map< String, String > fileCaches;
 
     /**
      * If storing retrieved json from searches is enabled.
@@ -60,7 +47,7 @@ public class EDSMCache {
     /**
      *
      */
-    public EDSMCache() {
+    public EDACache() {
         this(true);
     }
 
@@ -68,11 +55,16 @@ public class EDSMCache {
      *
      * @param enableFileCache
      */
-    public EDSMCache(boolean enableFileCache) {
+    public EDACache( boolean enableFileCache) {
         fileCacheEnabled = enableFileCache;
-        builder = new QueryBuilder();
         recentlySearched = new ArrayList<>(  );
-        fileCaches = new ConcurrentHashMap<>();
+
+        load();
+
+        //Adds a shutdown hook to the runtime so the recentlySearched list is dumped to a file.
+        //Note, this will not execute if the JVM suddenly shuts down, such as a crash or forceful exit.
+        Thread dumpThread = new Thread( this::dump );
+        Runtime.getRuntime().addShutdownHook(dumpThread);
     }
 
     /**
@@ -81,7 +73,6 @@ public class EDSMCache {
      */
     public void enableFileCache(boolean enable) {
         fileCacheEnabled = enable;
-
     }
 
     /**
@@ -106,52 +97,54 @@ public class EDSMCache {
             return;
         }
 
-        validateUpdateFileCaches(system.name);
+        File edaFolder = new File( System.getProperty( "user.home" ) + File.separator +
+                "Documents" + File.separator + "EDA" ); //TODO merge all EDA related pathing to a separate utils lib
+        File srlFolder = new File(edaFolder.getAbsolutePath() + File.separator + "Cache");
+        File systemFile = new File( srlFolder.getAbsolutePath( ) + File.separator + system.name + ".srl" );
 
-        Runnable serializeRun = ( ) -> {
+        if (!edaFolder.exists()) {
+            boolean made = edaFolder.mkdir();
 
-            File edaFolder = new File( System.getProperty( "user.home" ) + File.separator +
-                    "Documents" + File.separator + "EDA" ); //TODO merge all EDA related pathing to a separate utils lib
-
-            File srlFolder = new File(edaFolder.getAbsolutePath() + File.separator + "Cache");
-
-            File systemFile = new File( srlFolder.getAbsolutePath( ) + File.separator + system.name + ".srl" );
-
-            if (!edaFolder.exists()) {
+            if (!made) {
                 return;
             }
+        }
 
-            if (!srlFolder.exists()) {
+        if (!srlFolder.exists()) {
+            boolean made = srlFolder.mkdir();
+
+            if (!made) {
                 return;
             }
+        }
 
-            if ( !systemFile.exists( ) ) {
+        if ( !systemFile.exists( ) ) {
 
-                try {
-                    boolean created = systemFile.createNewFile( );
+            try {
+                boolean created = systemFile.createNewFile( );
 
-                    if (!created)
-                        throw new IOException( "The .srl file for: " + system.name + "could not be created." );
+                if (!created)
+                    throw new IOException( "The .srl file for: " + system.name + "could not be created." );
 
-                } catch ( IOException e ) {
-                    e.printStackTrace( );
-                    //TODO logging
-                }
-            }
-
-            try ( ObjectOutputStream outStream = new ObjectOutputStream( new FileOutputStream( systemFile ) ) ) {
-                outStream.writeObject( system );
             } catch ( IOException e ) {
                 e.printStackTrace( );
                 //TODO logging
             }
+        }
 
-            fileCaches.put( system.name, systemFile.getAbsolutePath() );
-        };
+        try ( ObjectOutputStream outStream = new ObjectOutputStream( new FileOutputStream( systemFile ) ) ) {
+            outStream.writeObject( system );
+        } catch ( IOException e ) {
+            e.printStackTrace( );
+            //TODO logging
+        }
 
-        Thread thread = new Thread( serializeRun );
-        thread.setName( "System-serializer-" + system.name );
-        thread.start( );
+//        Runnable serializeRun = ( ) -> {
+//        };
+//
+//        Thread thread = new Thread( serializeRun );
+//        thread.setName( "System-serializer-" + system.name );
+//        thread.start( );
     }
 
     /**
@@ -167,7 +160,8 @@ public class EDSMCache {
 
         File edaFolder = new File (System.getProperty( "user.home" ) + File.separator +
                 "Documents" + File.separator + "EDA"); //TODO merge all EDA related pathing to a separate utils lib
-        File systemFile = new File( fileCaches.get( systemName ) );
+        File srlFolder = new File( edaFolder.getAbsolutePath() + File.separator + "Cache");
+        File systemFile = new File( srlFolder.getAbsolutePath() + File.separator + systemName + ".srl" );
 
         if (!edaFolder.exists()) {
             return system;
@@ -183,7 +177,6 @@ public class EDSMCache {
             e.printStackTrace();
         }
 
-
         return system;
     }
 
@@ -193,7 +186,8 @@ public class EDSMCache {
      * @return True if it is a valid system, false otherwise.
      */
     public boolean isCached( String systemName) {
-        return checkCache( systemName );
+        boolean cached = checkCache( systemName );
+        return cached;
     }
 
     /**
@@ -203,6 +197,7 @@ public class EDSMCache {
      */
     public void updateCache(String systemName) {
         if (recentlySearched.size() == maxMemoryCacheSize) {
+
             recentlySearched.remove( 0 );
         }
 
@@ -214,20 +209,60 @@ public class EDSMCache {
      * Checks if the system name is in the cache.
      * @return
      */
-    public boolean checkCache(String systemName) {
+    private boolean checkCache(String systemName) {
         return recentlySearched.contains( systemName );
     }
 
     /**
-     *
+     * Writes the contents of recentlySearched to the searched.txt file to update
+     * the file.
+     * This will be called automatically by a shutdown hook.
      */
-    private void validateUpdateFileCaches(String systemName) {
-        if (fileCaches.size() == maxFileCacheSize) {
-           Set<String> cacheKeys = fileCaches.keySet();
+    private void dump() {
+        File edaFolder = new File( System.getProperty( "user.home" ) + File.separator +
+                "Documents" + File.separator + "EDA" ); //TODO merge all EDA related pathing to a separate utils lib
 
-           for (String s : cacheKeys) {
-               fileCaches.remove( s );
-           }
+        File srlFolder = new File(edaFolder.getAbsolutePath() + File.separator + "Cache");
+        File recent = new File( srlFolder.getAbsolutePath() + File.separator + "searched.txt");
+
+        if (recent.exists()) {
+            try (PrintWriter printWriter = new PrintWriter(recent)) { //Clear file first
+                printWriter.println( "" );
+            } catch ( FileNotFoundException e ) {
+                e.printStackTrace( );
+            }
+
+            //Now we'll write the contents for recentlySearched to the file.
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(recent, true))) {
+                for (String name : recentlySearched) {
+                    writer.write( name );
+                }
+            } catch ( IOException e ) {
+                e.printStackTrace( );
+            }
+        }
+    }
+
+    /**
+     * Loads the content of searched.txt to recentlySearched.
+     */
+    private void load() {
+        File edaFolder = new File( System.getProperty( "user.home" ) + File.separator +
+                "Documents" + File.separator + "EDA" ); //TODO merge all EDA related pathing to a separate utils lib
+
+        File srlFolder = new File(edaFolder.getAbsolutePath() + File.separator + "Cache");
+        File recent = new File( srlFolder.getAbsolutePath() + File.separator + "searched.txt");
+
+        if (recent.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(recent))) {
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    recentlySearched.add( line );
+                }
+            } catch ( IOException e ) {
+                e.printStackTrace( );
+            }
         }
     }
 

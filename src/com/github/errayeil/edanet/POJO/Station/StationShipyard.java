@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.Station;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -9,6 +10,9 @@ import java.util.Arrays;
  * @since HIP 2
  */
 public class StationShipyard implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 7403544734031649738L;
 
     public long id;
 

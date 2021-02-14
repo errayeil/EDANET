@@ -2,6 +2,7 @@ package com.github.errayeil.edanet.POJO.System;
 
 import com.github.errayeil.edanet.POJO.Body.CelestialBody;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -11,7 +12,10 @@ import java.util.Arrays;
  * @since HIP 2
  */
 public class EDSMSystem implements Serializable {
-    
+
+    @Serial
+    private static final long serialVersionUID = 7660957947376149964L;
+
     /**
      *
      */

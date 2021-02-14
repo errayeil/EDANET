@@ -1,5 +1,6 @@
 package com.github.errayeil.edanet.POJO.System;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -9,7 +10,10 @@ import java.util.Map;
  * @since HIP 2
  */
 public class SystemTraffic implements Serializable {
-    
+
+    @Serial
+    private static final long serialVersionUID = -466014956299980190L;
+
     /**
      *
      */

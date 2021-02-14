@@ -1,5 +1,8 @@
 package com.github.errayeil.edanet.POJO.System;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * Used when getting a list of systems in a specified radius or size (if cube search) of
  * a reference system.
@@ -8,7 +11,10 @@ package com.github.errayeil.edanet.POJO.System;
  * @version HIP 2
  * @since HIP 2
  */
-public class BasicSystem {
+public class BasicSystem implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -3223917284955807737L;
 
     /**
      *

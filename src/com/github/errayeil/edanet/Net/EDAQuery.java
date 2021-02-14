@@ -2,7 +2,6 @@ package com.github.errayeil.edanet.Net;
 
 import com.github.errayeil.edanet.POJO.System.BasicSystem;
 import com.github.errayeil.edanet.POJO.System.EDSMSystem;
-import com.github.errayeil.edanet.POJO.System.SystemCoordinates;
 import com.github.errayeil.edanet.POJO.System.SystemStation;
 import com.github.errayeil.edanet.Parsers.EDSMParser;
 import org.apache.http.HttpEntity;
@@ -16,6 +15,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -42,7 +42,7 @@ public class EDAQuery {
      * A cache to serialize previous searched systems
      * for better lookup times and bandwidth reduction.
      */
-    private EDSMCache cache;
+    private EDACache cache;
 
     /**
      * The system we will be querying.
@@ -68,7 +68,7 @@ public class EDAQuery {
      */
     public EDAQuery( ) {
         builder = new QueryBuilder( );
-        cache = new EDSMCache( true );
+        cache = new EDACache( true );
     }
 
     /**
@@ -84,7 +84,6 @@ public class EDAQuery {
             targetSystem = systemName;
             return true;
         }
-
         return false;
     }
 
@@ -246,11 +245,14 @@ public class EDAQuery {
         }
 
         try {
-            System.out.println( "Awaiting before return." );
             barrier.await( );
         } catch ( InterruptedException | BrokenBarrierException e ) {
             e.printStackTrace( );
         }
+
+        cache.updateCache( system.name.toLowerCase( Locale.ROOT ));
+        cache.serializeSystem( system );
+
         return system;
     }
 
@@ -283,6 +285,10 @@ public class EDAQuery {
      * doesn't exist from going through prevents errors.
      */
     private boolean validateSystem(String systemName) {
+        if ( cache.isCached( systemName) ) {
+            return true;
+        }
+
         builder.setTargetSystem( systemName );
 
         String content = null;
